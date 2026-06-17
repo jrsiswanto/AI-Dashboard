@@ -8,6 +8,7 @@ const CONFIG = {
   DATA_FILE: 'Sales_BY_Category_202606040914-1.csv' 
 };
 
+
 let barChartInstance = null;
 let scatterChartInstance = null;
 let globalSummary = {};     
@@ -276,5 +277,7 @@ Mengevaluasi kontrak dengan pihak pemasok utama pakaian untuk menekan biaya baha
   document.getElementById('btn-next').addEventListener('click', () => {
     if (currentSlide < insightSlides.length - 1) { currentSlide++; renderSlide(); }
   });
+
+  
 
 });
