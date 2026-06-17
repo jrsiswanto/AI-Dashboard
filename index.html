@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analisis Performa Penjualan & Profitabilitas</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script>
+    tailwind.config = {
+      theme: { extend: { fontFamily: { sans: ['"Plus Jakarta Sans"', 'sans-serif'], }, colors: { brand: { 50: '#f0fdfa', 100: '#ccfbf1', 200: '#99f6e4', 500: '#14b8a6', 600: '#0d9488', 900: '#134e4a', } } } }
+    }
+  </script>
+
+  <style>
+    body { background-color: #f8fafc; }
+    .tab-content { transition: opacity 0.3s ease; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    canvas { width: 100% !important; height: 100% !important; }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50">
+    <div class="max-w-[1500px] mx-auto px-6 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-brand-50 border border-brand-100 flex items-center justify-center text-brand-600 shadow-inner">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+        </div>
+        <div>
+          <h1 class="text-xl font-bold text-slate-900 tracking-tight">Data<span class="text-brand-600">Visualization</span></h1>
+          <p class="text-xs text-slate-500 font-medium">Sales & Profit Evaluator</p>
+        </div>
+      </div>
+      <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200 shadow-inner">
+        <button id="tab-ai" onclick="switchTab('ai')" class="px-6 py-2 text-sm font-semibold rounded-md transition-all duration-200 bg-white text-brand-600 shadow border border-slate-200">AI Insights</button>
+        <button id="tab-tableau" onclick="switchTab('tableau')" class="px-6 py-2 text-sm font-semibold rounded-md transition-all duration-200 text-slate-500 hover:text-slate-700">Visualisasi Tableau</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-grow p-6 max-w-[1500px] mx-auto w-full">
+
+    <div id="panel-ai" class="tab-content block space-y-6">
+      
+      <div class="mb-4">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Analisis Performa Penjualan & Profitabilitas</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"><p class="text-sm font-semibold text-slate-500 mb-2">Total Sales</p><h3 id="kpi-sales" class="text-3xl font-extrabold text-slate-800">-</h3></div>
+        <div class="bg-white p-6 rounded-2xl border border-teal-100 bg-brand-50/30 shadow-sm"><p class="text-sm font-semibold text-brand-700 mb-2">Total Profit</p><h3 id="kpi-profit" class="text-3xl font-extrabold text-brand-600">-</h3></div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"><p class="text-sm font-semibold text-slate-500 mb-2">Profit Margin</p><h3 id="kpi-margin" class="text-3xl font-extrabold text-slate-800">-</h3></div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"><p class="text-sm font-semibold text-slate-500 mb-2">Total Quantity Sold</p><h3 id="kpi-orders" class="text-3xl font-extrabold text-slate-800">-</h3></div>
+      </div>
+      <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
+        <p class="text-slate-600 font-medium leading-relaxed" id="teks-fokus-analisis">
+          Perusahaan menunjukkan kinerja keuangan yang solid dengan total penjualan sebesar $5,875,869.98 dan profit sebesar $1,309,172.17, menghasilkan margin keuntungan 22.3%. Meskipun demikian, evaluasi data secara menyeluruh tetap diperlukan untuk menemukan segmen pasar atau lini produk yang memiliki potensi pertumbuhan tersembunyi.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+          <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4"><h3 class="font-bold text-lg text-slate-800">Komparasi Sales & Profit per Kategori</h3></div>
+          <div class="flex-grow min-h-[300px] relative"><canvas id="chart-bar-comparison"></canvas></div>
+        </div>
+        <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
+          <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4"><h3 class="font-bold text-lg text-slate-800">Korelasi Performa Sub-Kategori</h3></div>
+          <div class="flex-grow min-h-[300px] relative"><canvas id="chart-scatter-performance"></canvas></div>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col mt-8 transition hover:shadow-md">
+        <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-rose-50/30 rounded-t-2xl">
+          <h3 class="font-bold text-lg text-slate-800">Conflict / Analisis Masalah</h3>
+          <button id="btn-ai-conflict" class="bg-rose-600 hover:bg-rose-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition-colors">
+            Generate Diagnosis AI
+          </button>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 divide-y lg:divide-y-0 lg:divide-x divide-slate-100">
+          <div class="p-6 col-span-1">
+            <h4 class="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider">Anomali Terdeteksi:</h4>
+            <ul id="list-anomalies" class="space-y-3 text-sm text-slate-700 list-disc pl-4 font-medium">
+              <li class="animate-pulse text-slate-400">Mensinkronisasi data...</li>
+            </ul>
+          </div>
+          <div class="p-6 col-span-2 flex items-center justify-center min-h-[150px]">
+            <div id="box-ai-conflict" class="w-full">
+              <p class="text-slate-500 font-medium text-sm text-center">Silakan tekan tombol <b class="text-rose-600">Generate Diagnosis AI</b> untuk menganalisis akar masalah data di samping.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col col-span-1 transition hover:shadow-md overflow-hidden">
+          <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
+            <h3 class="font-bold text-base text-slate-800">Matriks Performa</h3>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="text-xs text-slate-500 uppercase bg-slate-50/50">
+                <tr>
+                  <th class="px-4 py-3 font-bold">Kategori</th>
+                  <th class="px-4 py-3 font-bold text-right">Penjualan</th>
+                  <th class="px-4 py-3 font-bold text-right">Margin</th>
+                </tr>
+              </thead>
+              <tbody id="table-category" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <tr><td colspan="3" class="px-4 py-8 text-center text-slate-400 animate-pulse">Memuat...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col col-span-2 transition hover:shadow-md">
+          <div class="px-6 py-5 border-b border-slate-100 flex justify-between items-center bg-brand-50/30 rounded-t-2xl">
+            <h3 class="font-bold text-lg text-slate-800">Resolution · Insight & Rekomendasi</h3>
+            <button id="btn-ai-insight" class="bg-brand-600 hover:bg-brand-700 text-white px-5 py-2 rounded-lg text-sm font-bold shadow transition-colors">
+              Generate Solusi AI
+            </button>
+          </div>
+          
+          <div class="p-6 flex-grow flex items-center justify-center min-h-[220px]">
+            <div id="box-ai-insight" class="w-full">
+               <p class="text-slate-500 font-medium text-sm text-center">Silakan tekan tombol <b class="text-brand-600">Generate Solusi AI</b> untuk merumuskan langkah strategis.</p>
+            </div>
+          </div>
+
+          <div id="carousel-nav" class="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-between items-center hidden rounded-b-2xl">
+             <button id="btn-prev" class="px-4 py-2 bg-white border border-slate-200 rounded hover:bg-slate-100 text-slate-600 text-sm font-bold disabled:opacity-40 transition-colors">
+               &larr; Sebelumnya
+             </button>
+             <span id="carousel-indicator" class="text-sm font-bold text-brand-600 bg-brand-50 px-3 py-1 rounded-full border border-brand-100">
+               Solusi 1 / 3
+             </span>
+             <button id="btn-next" class="px-4 py-2 bg-white border border-slate-200 rounded hover:bg-slate-100 text-slate-600 text-sm font-bold disabled:opacity-40 transition-colors">
+               Selanjutnya &rarr;
+             </button>
+          </div>
+        </div>
+
+      </div>
+
+    </div> 
+
+    <div id="panel-tableau" class="tab-content hidden">
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-3 w-full min-h-[850px] flex flex-col">
+        <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 relative w-full h-full overflow-auto p-2">
+          <p class="text-center mt-10 text-slate-400">Tableau Dashboard Area</p>
+        </div>
+      </div>
+    </div> 
+  </main>
+
+  <script>
+    function switchTab(tab) {
+      const btnAi = document.getElementById('tab-ai'), btnTableau = document.getElementById('tab-tableau'), panelAi = document.getElementById('panel-ai'), panelTableau = document.getElementById('panel-tableau');
+      const activeClass = "px-6 py-2 text-sm font-semibold rounded-md bg-white text-brand-600 shadow border border-slate-200", inactiveClass = "px-6 py-2 text-sm font-semibold rounded-md text-slate-500 hover:text-slate-700 border border-transparent";
+      if (tab === 'ai') { btnAi.className = activeClass; btnTableau.className = inactiveClass; panelAi.classList.remove('hidden'); panelTableau.classList.add('hidden'); }
+      else { btnTableau.className = activeClass; btnAi.className = inactiveClass; panelTableau.classList.remove('hidden'); panelAi.classList.add('hidden'); }
+    }
+  </script>
+  <script src="main.js"></script>
+</body>
+</html>
