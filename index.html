@@ -49,7 +49,6 @@
   <main class="flex-grow p-6 max-w-[1500px] mx-auto w-full">
 
     <div id="panel-ai" class="tab-content block space-y-6">
-      
       <div class="mb-4">
         <h2 class="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Analisis Performa Penjualan & Profitabilitas</h2>
       </div>
@@ -60,13 +59,12 @@
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"><p class="text-sm font-semibold text-slate-500 mb-2">Profit Margin</p><h3 id="kpi-margin" class="text-3xl font-extrabold text-slate-800">-</h3></div>
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm"><p class="text-sm font-semibold text-slate-500 mb-2">Total Quantity Sold</p><h3 id="kpi-orders" class="text-3xl font-extrabold text-slate-800">-</h3></div>
       </div>
+      
       <div class="p-5 bg-slate-50 border border-slate-200 rounded-xl">
         <p class="text-slate-600 font-medium leading-relaxed" id="teks-fokus-analisis">
           Perusahaan menunjukkan kinerja keuangan yang solid dengan total penjualan sebesar $5,875,869.98 dan profit sebesar $1,309,172.17, menghasilkan margin keuntungan 22.3%. Meskipun demikian, evaluasi data secara menyeluruh tetap diperlukan untuk menemukan segmen pasar atau lini produk yang memiliki potensi pertumbuhan tersembunyi.
         </p>
       </div>
-
-      
 
       <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm flex flex-col">
@@ -103,7 +101,6 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
         <div class="bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col col-span-1 transition hover:shadow-md overflow-hidden">
           <div class="px-5 py-4 border-b border-slate-100 bg-slate-50">
             <h3 class="font-bold text-base text-slate-800">Matriks Performa</h3>
@@ -150,56 +147,52 @@
              </button>
           </div>
         </div>
-
       </div>
-
     </div> 
 
     <div id="panel-tableau" class="tab-content hidden">
-  <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-3 w-full min-h-[850px] flex flex-col">
-    <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 relative w-full h-full overflow-hidden p-2">
-      
-      <div class='tableauPlaceholder' id='viz1781662200740' style='position: relative; width: 100%; height: 100%;'>
-        <noscript>
-          <a href='#'>
-            <img alt='Dashboard' src='https://public.tableau.com/static/images/Bo/Book_17814352822560/Dashboard/1_rss.png' style='border: none' />
-          </a>
-        </noscript>
-        
-        <object class='tableauViz' style='display:none;'>
-          <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
-          <param name='embed_code_version' value='3' /> 
-          <param name='site_root' value='' />
-          <param name='name' value='Book_17814352822560/Dashboard' />
-          <param name='tabs' value='no' />
-          <param name='toolbar' value='yes' />
-          <param name='static_image' value='https://public.tableau.com/static/images/Bo/Book_17814352822560/Dashboard/1.png' /> 
-          <param name='animate_transition' value='yes' />
-          <param name='display_static_image' value='yes' />
-          <param name='display_spinner' value='yes' />
-          <param name='display_overlay' value='yes' />
-          <param name='display_count' value='yes' />
-          <param name='language' value='en-US' />
-          <param name='device' value='desktop' />
-        </object>
-      </div>
-      
-      <script type='text/javascript'>
-        var divElement = document.getElementById('viz1781662200740');
-        var vizElement = divElement.getElementsByTagName('object')[0];
-        
-        // Memaksa lebar 100% dan tinggi statis agar proporsional dengan min-h-[850px] dari parent div
-        vizElement.style.width = '100%';
-        vizElement.style.height = '800px'; 
-        
-        var scriptElement = document.createElement('script');
-        scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
-        vizElement.parentNode.insertBefore(scriptElement, vizElement);
-      </script>
+      <div class="bg-white rounded-2xl border border-slate-100 shadow-sm p-3 w-full min-h-[850px] flex flex-col">
+        <div class="flex-1 bg-slate-50 rounded-xl border border-slate-200 relative w-full h-full overflow-hidden p-2">
+          
+          <div class='tableauPlaceholder' id='viz1781662200740' style='position: relative; width: 100%; height: 100%;'>
+            <noscript>
+              <a href='#'>
+                <img alt='Dashboard' src='https://public.tableau.com/static/images/Bo/Book_17814352822560/Dashboard/1_rss.png' style='border: none' />
+              </a>
+            </noscript>
+            
+            <object class='tableauViz' style='display:none;'>
+              <param name='host_url' value='https%3A%2F%2Fpublic.tableau.com%2F' /> 
+              <param name='embed_code_version' value='3' /> 
+              <param name='site_root' value='' />
+              <param name='name' value='Book_17814352822560/Dashboard' />
+              <param name='tabs' value='no' />
+              <param name='toolbar' value='yes' />
+              <param name='static_image' value='https://public.tableau.com/static/images/Bo/Book_17814352822560/Dashboard/1.png' /> 
+              <param name='animate_transition' value='yes' />
+              <param name='display_static_image' value='yes' />
+              <param name='display_spinner' value='yes' />
+              <param name='display_overlay' value='yes' />
+              <param name='display_count' value='yes' />
+              <param name='language' value='en-US' />
+              <param name='device' value='desktop' />
+            </object>
+          </div>
+          
+          <script type='text/javascript'>
+            var divElement = document.getElementById('viz1781662200740');
+            var vizElement = divElement.getElementsByTagName('object')[0];
+            vizElement.style.width = '100%';
+            vizElement.style.height = '800px'; 
+            
+            var scriptElement = document.createElement('script');
+            scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js';
+            vizElement.parentNode.insertBefore(scriptElement, vizElement);
+          </script>
 
+        </div>
+      </div>
     </div>
-  </div>
-</div>
   </main>
 
   <script>

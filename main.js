@@ -1,13 +1,8 @@
-/* =====================================================================
-   MAIN.JS - MASTER-DETAIL & CAROUSEL INSIGHTS (LOCAL AI) - FINAL STRICT
-===================================================================== */
-
 const CONFIG = {
-  OLLAMA_URL: 'http://localhost:11434/api/generate',
-  OLLAMA_MODEL: 'llama3.2:1b', 
+  // Mengarah ke file serverless Vercel kita
+  LOCAL_API_URL: '/api/groq', 
   DATA_FILE: 'Sales_BY_Category_202606040914-1.csv' 
 };
-
 
 let barChartInstance = null;
 let scatterChartInstance = null;
@@ -32,10 +27,6 @@ function stdDev(arr) {
   const m = mean(arr);
   return Math.sqrt(arr.reduce((s, v) => s + (v - m) ** 2, 0) / arr.length);
 }
-function zScore(value, arr) {
-  const s = stdDev(arr);
-  return s === 0 ? 0 : (value - mean(arr)) / s;
-}
 
 function detectAnomalies(data) {
   let anomalies = [];
@@ -53,27 +44,27 @@ function detectAnomalies(data) {
   return anomalies;
 }
 
-async function callOllama(prompt) {
-  const res = await fetch(CONFIG.OLLAMA_URL, {
+// Fungsi callGroq sekarang memanggil backend serverless Vercel kita
+async function callGroq(prompt) {
+  const res = await fetch(CONFIG.LOCAL_API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: CONFIG.OLLAMA_MODEL,
-      prompt: prompt,
-      stream: false,
-      options: { temperature: 0.1, num_predict: 800 } // Temperature diturunkan agar AI tidak terlalu "kreatif"
-    })
+    body: JSON.stringify({ prompt: prompt })
   });
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
+  
+  if (!res.ok) {
+    const errData = await res.json();
+    throw new Error(errData.error || `HTTP ${res.status}`);
+  }
+  
   const data = await res.json();
-  return data.response || '';
+  return data.choices[0].message.content || '';
 }
 
 function formatAIResponse(text) {
   return text.replace(/\*\*(.+?)\*\*/g, '<b class="text-slate-900">$1</b>').replace(/\n/g, '<br>');                                   
 }
 
-// Parser Ketat
 function parseListIntoSlides(text) {
   if (text.includes('|||')) {
     const parts = text.split('|||').map(s => s.trim()).filter(s => s.length > 20);
@@ -90,7 +81,6 @@ function renderSlide() {
   const btnPrev = document.getElementById('btn-prev');
   const btnNext = document.getElementById('btn-next');
   
-  // Jika karena suatu hal slide kosong, berikan fallback
   const slideContent = insightSlides[currentSlide] || "Gagal memproses solusi. Silakan Regenerate.";
 
   box.innerHTML = `
@@ -203,17 +193,18 @@ ATURAN MUTLAK:
 3. WAJIB DITULIS DALAM TEPAT 1 PARAGRAF UTUH SAJA. Jangan ada baris baru (enter), jangan ada poin/nomor. Tulis mengalir saja.`;
 
     try {
-      const aiResponse = await callOllama(prompt);
+      const aiResponse = await callGroq(prompt);
       box.innerHTML = `<div class="bg-rose-50/50 p-6 rounded-xl border border-rose-100 w-full min-h-[160px] flex items-center"><p class="text-slate-700 text-sm leading-relaxed text-justify w-full">${formatAIResponse(aiResponse)}</p></div>`;
       btn.innerText = "Regenerate Diagnosis";
     } catch (error) {
-      box.innerHTML = `<p class="text-rose-600 text-sm w-full text-center">Gagal terhubung ke Ollama.</p>`;
+      console.error(error);
+      box.innerHTML = `<p class="text-rose-600 text-sm w-full text-center">Gagal memproses diagnosis AI. Pastikan Vercel API terkonfigurasi.</p>`;
       btn.innerText = "Coba Lagi";
     }
     btn.disabled = false;
   });
 
-  // ── TOMBOL INSIGHT (STRICT FORMATTING) ─────────────────────────
+  // ── TOMBOL INSIGHT ─────────────────────────
   document.getElementById('btn-ai-insight').addEventListener('click', async (e) => {
     const btn = e.currentTarget;
     const box = document.getElementById('box-ai-insight');
@@ -224,7 +215,6 @@ ATURAN MUTLAK:
     nav.classList.add('hidden'); 
     box.innerHTML = `<p class="animate-pulse text-brand-600 text-sm font-medium w-full text-center">Merumuskan strategi perbaikan dan action plan...</p>`;
 
-    // PROMPT DIKUNCI MATI
     const prompt = `Tugas: Berikan 3 solusi strategis untuk anomali berikut: ${globalAnomalies.join(' ')}.
 
 ATURAN MUTLAK (JIKA DILANGGAR JAWABAN GAGAL):
@@ -241,20 +231,16 @@ Menerapkan strategi cross-selling antara produk aksesoris yang untung besar deng
 Mengevaluasi kontrak dengan pihak pemasok utama pakaian untuk menekan biaya bahan baku. Divisi pengadaan barang wajib melakukan negosiasi ulang... (lanjutkan sampai 4 kalimat).`;
 
     try {
-      const aiResponse = await callOllama(prompt);
+      const aiResponse = await callGroq(prompt);
       
-      // Filter out any garbage intro if AI still disobeys
       let cleanedResponse = aiResponse;
       if (cleanedResponse.includes('|||')) {
-          // Sometimes AI adds intro text before the first actual paragraph.
-          // Because we force it to start immediately, we trust the split.
           insightSlides = parseListIntoSlides(cleanedResponse);
       } else {
-          insightSlides = [cleanedResponse]; // Fallback
+          insightSlides = [cleanedResponse]; 
       }
 
       currentSlide = 0;
-      
       renderSlide(); 
       
       if(insightSlides.length > 1) {
@@ -263,13 +249,13 @@ Mengevaluasi kontrak dengan pihak pemasok utama pakaian untuk menekan biaya baha
       
       btn.innerText = "Regenerate Solusi";
     } catch (error) {
-      box.innerHTML = `<p class="text-rose-600 text-sm w-full text-center">Gagal terhubung ke Ollama.</p>`;
+      console.error(error);
+      box.innerHTML = `<p class="text-rose-600 text-sm w-full text-center">Gagal memproses solusi AI. Pastikan Vercel API terkonfigurasi.</p>`;
       btn.innerText = "Coba Lagi";
     }
     btn.disabled = false;
   });
 
-  // ── EVENT LISTENER TOMBOL PREV/NEXT CAROUSEL ─────────────────
   document.getElementById('btn-prev').addEventListener('click', () => {
     if (currentSlide > 0) { currentSlide--; renderSlide(); }
   });
@@ -277,7 +263,4 @@ Mengevaluasi kontrak dengan pihak pemasok utama pakaian untuk menekan biaya baha
   document.getElementById('btn-next').addEventListener('click', () => {
     if (currentSlide < insightSlides.length - 1) { currentSlide++; renderSlide(); }
   });
-
-  
-
 });
